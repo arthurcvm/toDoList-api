@@ -44,27 +44,57 @@ function listarTarefas(req, res) {
 
   res.json({
     totalItens: tarefasRetornar.length,
-    tarefas: tarefasRetornar.slice(0).splice((pagina - 1) * itensPorPagina, itensPorPagina),
-    pagina: pagina
-  })
+    tarefas: tarefasRetornar
+      .slice(0)
+      .splice((pagina - 1) * itensPorPagina, itensPorPagina),
+    pagina: pagina,
+  });
 }
 
-function cadastrarTarefa(req, res){
-  if(!req.body['nome'] && !req.body['concluida']){
-    res.status(400).json({erro: 'Requisição inválida.'})
+function cadastrarTarefa(req, res) {
+  if (!req.body["nome"] && !req.body["concluida"]) {
+    res.status(400).json({ erro: "Requisição inválida." });
   }
 
   const tarefa = {
     id: uuidv4(),
-    nome: req.body['nome'],
-    concluida: req.body['concluida']
-  }
+    nome: req.body["nome"],
+    concluida: req.body["concluida"],
+  };
   tarefas.push(tarefa);
   res.json(tarefa);
+}
+
+function atualizarTarefa(req, res) {
+  if (!req.body["nome"] && !req.body["concluida"]) {
+    res.status(400).json({ erro: "Requisição inválida." });
+  }
+
+  const id = req.params.id;
+  let tarefaAtualizada = false;
+
+  const tarefa = tarefas.map((tarefa) => {
+    if (tarefa.id === id) {
+      tarefa.nome = req.body["nome"];
+      tarefa.concluida = req.body["concluida"];
+      tarefaAtualizada = true;
+    }
+    return tarefa;
+  });
+
+  if (!tarefaAtualizada) {
+    res.status(404).json({ erro: "Tarefa não encontrada." });
+  }
+  res.json({
+    id: id,
+    nome: req.body["nome"],
+    concluida: req.body["concluida"],
+  });
 }
 
 module.exports = {
   listarTarefaId,
   listarTarefas,
   cadastrarTarefa,
+  atualizarTarefa,
 };
